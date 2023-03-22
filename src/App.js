@@ -55,7 +55,7 @@ function App() {
           <img src={logo} alt="My Image" />
         </div>
         {!isConnected && (
-            <Button variant="contained" color="primary" onClick={connectWallet}>
+            <Button variant="contained" color="info" onClick={connectWallet}>
               Connect Wallet
             </Button>
         )}
@@ -118,7 +118,7 @@ function App() {
                 </div>
                 <p>Joining the Circle: {selectedNftId1} + {selectedNftId2} + {selectedNftId3} + {selectedNftId4}</p>
                 <div>
-                  <Button variant="contained" color="primary">
+                  <Button variant="contained" color="info">
                     Cross the Ether(Burn)
                   </Button>
                 </div>
