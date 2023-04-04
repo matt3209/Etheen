@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
 import logo from '../src/woe_logo.png';
 import { Button } from '@material-ui/core';
+import Wizard from './models/Wizard';
 
 
 function App() {
@@ -36,10 +37,17 @@ function App() {
         const contract = new web3.eth.Contract(contractABI, contractAddress);
         const balance = await contract.methods.balanceOf(account).call();
         const tokenIds = [];
+        let newWizard;
 
         for (let i = 0; i < balance; i++) {
           const tokenId = await contract.methods.tokenOfOwnerByIndex(account, i).call();
-          tokenIds.push(tokenId);
+          const tokenJson = await contract.methods.tokenURI(tokenId).call();
+          const response = await fetch(tokenJson);
+          const data = await response.json();
+
+          const imageUrl = data.image;
+          const newWizard = new Wizard(tokenId,imageUrl) //not initalized warning, check into this
+          tokenIds.push(newWizard);
         }
 
         setNftIds(tokenIds);
@@ -69,52 +77,74 @@ function App() {
               <h1>Burnable Wizards</h1>
               <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <div className="dropdown-wrapper">
-                  <select
+                  <div><select
                       className="form-select"
                       value={selectedNftId1}
                       onChange={(e) => setSelectedNftId1(e.target.value)}>
-                    {nftIds.map((id) => (
-                        <option value={id} key={id}>
-                          {id}
+                    <option value="">Wizard</option>
+                    {nftIds.map((newWizard) => (
+                        <option value={newWizard.id} key={newWizard.id}>
+                          {newWizard.id}
                         </option>
                     ))}
                   </select>
                 </div>
+                  {selectedNftId1 && (
+                      <img src={nftIds.find(wizard => wizard.id === selectedNftId1).imageUrl}/>
+                  )}
+                </div>
                 <div className="dropdown-wrapper">
-                  <select
+                  <div><select
                       className="form-select"
                       value={selectedNftId2}
                       onChange={(e) => setSelectedNftId2(e.target.value)}>
-                    {nftIds.map((id) => (
-                        <option value={id} key={id}>
-                          {id}
+                    <option value="">Wizard</option>
+                    {nftIds.map((newWizard) => (
+                        <option value={newWizard.id} key={newWizard.id}>
+                          {newWizard.id}
                         </option>
                     ))}
                   </select>
+                  </div>
+                  {selectedNftId2 && (
+                      <img src={nftIds.find(newWizard => newWizard.id === selectedNftId2).imageUrl}/>
+                  )}
                 </div>
                 <div className="dropdown-wrapper">
+                  <div>
                   <select
                       className="form-select"
                       value={selectedNftId3}
                       onChange={(e) => setSelectedNftId3(e.target.value)}>
-                    {nftIds.map((id) => (
-                        <option value={id} key={id}>
-                          {id}
+                    <option value="">Wizard</option>
+                    {nftIds.map((newWizard) => (
+                        <option value={newWizard.id} key={newWizard.id}>
+                          {newWizard.id}
                         </option>
                     ))}
                   </select>
+                  </div>
+                  {selectedNftId3 && (
+                      <img src={nftIds.find(newWizard => newWizard.id === selectedNftId3).imageUrl}/>
+                  )}
                 </div>
                 <div className="dropdown-wrapper">
+                  <div>
                   <select
                       className="form-select"
                       value={selectedNftId4}
                       onChange={(e) => setSelectedNftId4(e.target.value)}>
-                    {nftIds.map((id) => (
-                        <option value={id} key={id}>
-                          {id}
+                    <option value="">Wizard</option>
+                    {nftIds.map((newWizard) => (
+                        <option value={newWizard.id} key={newWizard.id}>
+                          {newWizard.id}
                         </option>
                     ))}
                   </select>
+                  </div>
+                  {selectedNftId4 && (
+                      <img src={nftIds.find(newWizard => newWizard.id === selectedNftId4).imageUrl}/>
+                  )}
                 </div>
                 <p>Joining the Circle: {selectedNftId1} + {selectedNftId2} + {selectedNftId3} + {selectedNftId4}</p>
                 <div>

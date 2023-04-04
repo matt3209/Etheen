@@ -36,3 +36,22 @@
     transform: rotate(360deg);
   }
 }
+
+.dropdown-menu {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.dropdown-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-right: 1rem;
+}
+
+.dropdown-wrapper img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  margin-bottom: 0.5rem;
+}
