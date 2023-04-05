@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
 import logo from '../src/woe_logo.png';
+import loadingImage from '../src/images/rotating-image.png';
 import { Button } from '@material-ui/core';
 import Wizard from './models/Wizard';
+import './App.css';
 
 
 function App() {
@@ -12,6 +14,10 @@ function App() {
   const [selectedNftId3, setSelectedNftId3] = useState("");
   const [selectedNftId4, setSelectedNftId4] = useState("");
   const [isConnected, setIsConnected] = useState(false);
+  const [numberOfTokens, setNumberOfTokens] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
+
 
   const connectWallet = async () => {
     try {
@@ -25,6 +31,7 @@ function App() {
   useEffect(() => {
     const loadNfts = async () => {
       if (isConnected) {
+        setIsLoading(true);
         const web3 = new Web3(window.ethereum);
         const accounts = await web3.eth.getAccounts();
         const account = accounts[0];
@@ -37,20 +44,22 @@ function App() {
         const contract = new web3.eth.Contract(contractABI, contractAddress);
         const balance = await contract.methods.balanceOf(account).call();
         const tokenIds = [];
-        let newWizard;
+        //let newWizard;
 
         for (let i = 0; i < balance; i++) {
           const tokenId = await contract.methods.tokenOfOwnerByIndex(account, i).call();
           const tokenJson = await contract.methods.tokenURI(tokenId).call();
           const response = await fetch(tokenJson);
           const data = await response.json();
-
-          const imageUrl = data.image;
+          const imageUrl = data?.image;
           const newWizard = new Wizard(tokenId,imageUrl) //not initalized warning, check into this
           tokenIds.push(newWizard);
         }
 
+        setNumberOfTokens(tokenIds.length);
         setNftIds(tokenIds);
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        setIsLoading(false);
       }
     };
     loadNfts();
@@ -62,17 +71,24 @@ function App() {
         <div>
           <img src={logo} alt="My Image" />
         </div>
+        {isLoading && (
+            <img
+                className="loading-image"
+                src={loadingImage}
+                alt="Loading..."
+            />
+        )}
         {!isConnected && (
             <Button variant="contained" color="info" onClick={connectWallet}>
               Connect Wallet
             </Button>
         )}
-        {nftIds.length < 4 && isConnected && (
+        {numberOfTokens < 4 && isConnected && !isLoading && (
             <div>
               <h4>Not Enough Wizards to Complete the Circle</h4>
             </div>
         )}
-        {nftIds.length > 3 && isConnected && (
+        {numberOfTokens > 3 && isConnected && !isLoading && (
             <div>
               <h1>Burnable Wizards</h1>
               <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -80,17 +96,20 @@ function App() {
                   <div><select
                       className="form-select"
                       value={selectedNftId1}
-                      onChange={(e) => setSelectedNftId1(e.target.value)}>
+                      onChange={(e) => {
+                        setSelectedNftId1(e.target.value);
+                      }}>
                     <option value="">Wizard</option>
-                    {nftIds.map((newWizard) => (
-                        <option value={newWizard.id} key={newWizard.id}>
-                          {newWizard.id}
-                        </option>
+                    {nftIds.filter((newWizard) => ![selectedNftId2, selectedNftId3, selectedNftId4].includes(newWizard.id))
+                        .map((newWizard) => (
+                            <option value={newWizard.id} key={newWizard.id}>
+                              {newWizard.id}
+                            </option>
                     ))}
                   </select>
                 </div>
                   {selectedNftId1 && (
-                      <img src={nftIds.find(wizard => wizard.id === selectedNftId1).imageUrl}/>
+                      <img src={nftIds.find(newWizard => newWizard.id === selectedNftId1).imageUrl}/>
                   )}
                 </div>
                 <div className="dropdown-wrapper">
@@ -99,10 +118,11 @@ function App() {
                       value={selectedNftId2}
                       onChange={(e) => setSelectedNftId2(e.target.value)}>
                     <option value="">Wizard</option>
-                    {nftIds.map((newWizard) => (
-                        <option value={newWizard.id} key={newWizard.id}>
-                          {newWizard.id}
-                        </option>
+                    {nftIds.filter((newWizard) => ![selectedNftId1, selectedNftId3, selectedNftId4].includes(newWizard.id))
+                        .map((newWizard) => (
+                            <option value={newWizard.id} key={newWizard.id}>
+                              {newWizard.id}
+                            </option>
                     ))}
                   </select>
                   </div>
@@ -117,10 +137,11 @@ function App() {
                       value={selectedNftId3}
                       onChange={(e) => setSelectedNftId3(e.target.value)}>
                     <option value="">Wizard</option>
-                    {nftIds.map((newWizard) => (
-                        <option value={newWizard.id} key={newWizard.id}>
-                          {newWizard.id}
-                        </option>
+                    {nftIds.filter((newWizard) => ![selectedNftId2, selectedNftId1, selectedNftId4].includes(newWizard.id))
+                        .map((newWizard) => (
+                            <option value={newWizard.id} key={newWizard.id}>
+                              {newWizard.id}
+                            </option>
                     ))}
                   </select>
                   </div>
@@ -135,10 +156,11 @@ function App() {
                       value={selectedNftId4}
                       onChange={(e) => setSelectedNftId4(e.target.value)}>
                     <option value="">Wizard</option>
-                    {nftIds.map((newWizard) => (
-                        <option value={newWizard.id} key={newWizard.id}>
-                          {newWizard.id}
-                        </option>
+                    {nftIds.filter((newWizard) => ![selectedNftId2, selectedNftId3, selectedNftId1].includes(newWizard.id))
+                        .map((newWizard) => (
+                            <option value={newWizard.id} key={newWizard.id}>
+                              {newWizard.id}
+                            </option>
                     ))}
                   </select>
                   </div>
